@@ -171,7 +171,6 @@ func main() {
 		}
 	}
 
-	// fmt.Println(socialLinks)
 	// сохраняем уникальные ссылки в файл
 	if len(socialLinks) == 0 {
 		fmt.Println("Соц-ссылки не найдены")
