@@ -131,12 +131,13 @@ func main() {
 
 	socialLinks := make(map[string]struct{})
 
-	domains, err := ReadUrlFile("landings_urls.txt")
+	// domains, err := ReadUrlFile("landings_urls.txt")
+	domains, err := GetLandingsUrls()
 	if err != nil {
-		log.Fatalf("Read file error: %v", err)
+		log.Fatalf("Read domains list in tools.kontur.ru error: %v", err)
 	}
 	if len(domains) == 0 {
-		log.Fatal("No domains found in file")
+		log.Fatal("No domains found")
 	}
 
 	fmt.Printf("%d domains was loaded to scan\n", len(domains))
@@ -173,7 +174,7 @@ func main() {
 
 	// сохраняем уникальные ссылки в файл
 	if len(socialLinks) == 0 {
-		fmt.Println("Соц-ссылки не найдены")
+		fmt.Println("Social links not found")
 		return
 	}
 	out := make([]string, 0, len(socialLinks))
