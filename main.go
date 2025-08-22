@@ -47,6 +47,7 @@ var socialMediaDomains []string = []string{
 	"ok.ru",
 	"youtube.com",
 	"youtu.be",
+	// dzen max vkvideo 
 }
 
 // URL админки лендингов
@@ -250,4 +251,7 @@ func main() {
 		log.Fatalf("write json: %v", err)
 	}
 	fmt.Printf("Saved %d unique links → %s\n", len(out), config.OutputFile)
+	// запись в базу данных 
+	// другой сервис который ходит в базу
+	// + вебхук в мм
 }
