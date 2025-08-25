@@ -43,6 +43,9 @@ func main() {
 	}
 
 	fmt.Printf("%d domains was loaded to scan\n", len(domains))
+	// for i := range domains {
+	// 	fmt.Println(domains[i])
+	// }
 
 	c := crawler.CreateCollector(config, domains)
 
