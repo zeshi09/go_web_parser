@@ -11,7 +11,10 @@ import (
 	"time"
 
 	"github.com/gocolly/colly"
-	"github.com/zeshi09/go_web_parser/internal"
+	"github.com/zeshi09/go_web_parser/internal/config"
+	"github.com/zeshi09/go_web_parser/internal/input"
+	"github.com/zeshi09/go_web_parser/internal/crawler"
+	"github.com/zeshi09/go_web_parser/internal/storage"
 )
 
 type Findings struct {
@@ -19,14 +22,14 @@ type Findings struct {
 	Findings []string `json:"findings"`
 }
 
-// Основной конфиг для приложения
-type Config struct {
-	ProxyURL       string
-	RequestTimeout time.Duration
-	MaxDepth       int
-	Parallelism    int
-	OutputFile     string
-}
+// // Основной конфиг для приложения
+// type Config struct {
+// 	ProxyURL       string
+// 	RequestTimeout time.Duration
+// 	MaxDepth       int
+// 	Parallelism    int
+// 	OutputFile     string
+// }
 
 // Домены, по которым мы ищем ссылки в социальных сетях
 var socialMediaDomains []string = []string{
@@ -96,35 +99,35 @@ func IsValidURL(rawURL string) bool {
 	return err == nil
 }
 
-// Создаем сущность скрапера
-func CreateCollector(config Config, domains []string) *colly.Collector {
-	c := colly.NewCollector(
-		colly.UserAgent(
-			"Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0",
-		),
-		colly.AllowedDomains(
-			domains...,
-		),
-	)
+// // Создаем сущность скрапера
+// func CreateCollector(config Config, domains []string) *colly.Collector {
+// 	c := colly.NewCollector(
+// 		colly.UserAgent(
+// 			"Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0",
+// 		),
+// 		colly.AllowedDomains(
+// 			domains...,
+// 		),
+// 	)
 
-	if config.ProxyURL != "" {
-		c.SetProxy(config.ProxyURL)
-	}
+// 	if config.ProxyURL != "" {
+// 		c.SetProxy(config.ProxyURL)
+// 	}
 
-	c.SetRequestTimeout(config.RequestTimeout)
+// 	c.SetRequestTimeout(config.RequestTimeout)
 
-	c.Limit(&colly.LimitRule{
-		DomainGlob:  "*",
-		Parallelism: config.Parallelism,
-		Delay:       1 * time.Second,
-	})
+// 	c.Limit(&colly.LimitRule{
+// 		DomainGlob:  "*",
+// 		Parallelism: config.Parallelism,
+// 		Delay:       1 * time.Second,
+// 	})
 
-	if config.MaxDepth > 0 {
-		c.MaxDepth = config.MaxDepth
-	}
+// 	if config.MaxDepth > 0 {
+// 		c.MaxDepth = config.MaxDepth
+// 	}
 
-	return c
-}
+// 	return c
+// }
 
 func main() {
 
@@ -152,7 +155,7 @@ func main() {
 
 	fmt.Printf("%d domains was loaded to scan\n", len(domains))
 
-	c := CreateCollector(config, domains)
+	c := internal.CreateCollector(config, domains)
 
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
 		link := strings.TrimSpace(e.Attr("href"))
