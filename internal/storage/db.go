@@ -2,25 +2,22 @@ package storage
 
 import (
 	"context"
-	"entgo.io/ent/dialect"
+	"log"
+
 	"github.com/zeshi09/go_web_parser/ent"
+
+	_ "github.com/lib/pq"
 )
 
-func Open(dsn string) (*ent.Client, func(), error) {
-	driver := ent.Driver(dialect.Postgres)
-
-	client, err := ent.Open(driver, dsn)
+func Open() {
+	client, err := ent.Open("postgres", "host=<host> port=<port> user=<user> dbname=<database> password=<password>")
 	if err != nil {
-		return nil, nil, err
+		log.Fatalf("failed opening connection to pg: %v", err)
 	}
 
+	defer client.Close()
 
 	if err := client.Schema.Create(context.Background()); err != nil {
-		client.Close()
-		return nil, nil, err
+		log.Fatalf("failed creating schema resources: %v", err)
 	}
-
-	cleanup := func() { _ = client.Close() }
-	
-	return client, cleanup, nil
 }

@@ -1,23 +1,18 @@
 package schema
 
-import (
-	"time"
+import "entgo.io/ent"
 
-	"entgo.io/ent"
-	"entgo.io/ent/schema/field"
-)
-
-// go:generate ent generate ./schema
-
+// SocialLink holds the schema definition for the SocialLink entity.
 type SocialLink struct {
 	ent.Schema
 }
 
+// Fields of the SocialLink.
 func (SocialLink) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("url").Unique(),
-		field.Time("created_at").Default(time.Now),
-		// опционально: исходный домен-источник, куда ты ходил
-		field.String("source_domain").Optional(),
-	}
+	return nil
+}
+
+// Edges of the SocialLink.
+func (SocialLink) Edges() []ent.Edge {
+	return nil
 }
