@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"entgo.io/ent/dialect"
 	"github.com/zeshi09/go_web_parser/ent"
 )
@@ -16,6 +15,12 @@ func Open(dsn string) (*ent.Client, func(), error) {
 	}
 
 
+	if err := client.Schema.Create(context.Background()); err != nil {
+		client.Close()
+		return nil, nil, err
+	}
+
+	cleanup := func() { _ = client.Close() }
 	
 	return client, cleanup, nil
 }
