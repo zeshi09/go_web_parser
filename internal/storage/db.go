@@ -3,7 +3,9 @@ package storage
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"entgo.io/ent/dialect"
@@ -11,6 +13,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/zeshi09/go_web_parser/ent"
+	"github.com/zeshi09/go_web_parser/ent/sociallink"
 )
 
 // DatabaseConfig содержит настройки подключения к БД
@@ -55,6 +58,27 @@ func (cfg *DatabaseConfig) DSN() string {
 	)
 }
 
+// extractDomain извлекает домен из URL
+func extractDomain(rawURL string) string {
+	// Для telegram ссылок вида tg://
+	if strings.HasPrefix(rawURL, "tg://") {
+		return "tg://"
+	}
+
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return ""
+	}
+
+	domain := parsed.Host
+	// Убираем www. если есть
+	if strings.HasPrefix(domain, "www.") {
+		domain = strings.TrimPrefix(domain, "www.")
+	}
+
+	return domain
+}
+
 // NewSocialLinkService создает новый сервис для работы с социальными ссылками
 func NewSocialLinkService(cfg *DatabaseConfig) (*SocialLinkService, error) {
 	drv, err := sql.Open(dialect.Postgres, cfg.DSN())
@@ -91,6 +115,32 @@ func (s *SocialLinkService) Close() error {
 	return s.client.Close()
 }
 
+// // SaveSocialLinks сохраняет массив социальных ссылок в базу данных
+// func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []string, sourceDomain string) error {
+// 	if len(socialLinks) == 0 {
+// 		return nil
+// 	}
+
+// 	// Создаем bulk операцию для массовой вставки
+// 	bulk := make([]*ent.SocialLinkCreate, 0, len(socialLinks))
+
+// 	for _, link := range socialLinks {
+// 		bulk = append(bulk, s.client.SocialLink.Create().
+// 			SetLink(link),
+// 		)
+// 	}
+
+// 	// Если есть что сохранять, выполняем bulk insert
+// 	if len(bulk) > 0 {
+// 		_, err := s.client.SocialLink.CreateBulk(bulk...).Save(ctx)
+// 		if err != nil {
+// 			return fmt.Errorf("error saving social links: %w", err)
+// 		}
+// 	}
+
+// 	return nil
+// }
+
 // SaveSocialLinks сохраняет массив социальных ссылок в базу данных
 func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []string, sourceDomain string) error {
 	if len(socialLinks) == 0 {
@@ -101,8 +151,26 @@ func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []s
 	bulk := make([]*ent.SocialLinkCreate, 0, len(socialLinks))
 
 	for _, link := range socialLinks {
+		domain := extractDomain(link)
+
+		// Проверяем, существует ли уже такая ссылка
+		exists, err := s.client.SocialLink.Query().
+			Where(sociallink.Link(link)).
+			Exist(ctx)
+		if err != nil {
+			return fmt.Errorf("error checking if link exists: %w", err)
+		}
+
+		// Если ссылка уже существует, пропускаем
+		if exists {
+			continue
+		}
+
 		bulk = append(bulk, s.client.SocialLink.Create().
-			SetLink(link),
+			SetLink(link).
+			SetURL(link).                  // Устанавливаем и URL
+			SetDomain(domain).             // Устанавливаем домен
+			SetSourceDomain(sourceDomain), // Устанавливаем источник
 		)
 	}
 
@@ -115,4 +183,35 @@ func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []s
 	}
 
 	return nil
+}
+
+// GetAllSocialLinks получает все социальные ссылки
+func (s *SocialLinkService) GetAllSocialLinks(ctx context.Context) ([]*ent.SocialLink, error) {
+	return s.client.SocialLink.Query().All(ctx)
+}
+
+// GetSocialLinksByDomain получает ссылки по домену
+func (s *SocialLinkService) GetSocialLinksByDomain(ctx context.Context, domain string) ([]*ent.SocialLink, error) {
+	return s.client.SocialLink.Query().
+		Where(sociallink.Domain(domain)).
+		All(ctx)
+}
+
+// GetStats возвращает статистику по социальным ссылкам
+func (s *SocialLinkService) GetStats(ctx context.Context) (map[string]int, error) {
+	links, err := s.GetAllSocialLinks(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	stats := make(map[string]int)
+	for _, link := range links {
+		domain := link.Domain
+		if domain == "" {
+			domain = "unknown"
+		}
+		stats[domain]++
+	}
+
+	return stats, nil
 }

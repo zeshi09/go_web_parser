@@ -78,6 +78,12 @@ func main() {
 			fmt.Printf("Request error: %v\n", err)
 		}
 	}
+	// for i := 0; i < 10; i++ {
+	// 	err = c.Visit("https://" + domains[i])
+	// 	if err != nil {
+	// 		fmt.Printf("Request error: %v\n", err)
+	// 	}
+	// }
 
 	// сохраняем уникальные ссылки в массив
 	if len(socialLinks) == 0 {
