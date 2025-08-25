@@ -8,7 +8,7 @@ import (
 )
 
 // Создаем сущность скрапера
-func CreateCollector(config Config, domains []string) *colly.Collector {
+func CreateCollector(config config.Config, domains []string) *colly.Collector {
 	c := colly.NewCollector(
 		colly.UserAgent(
 			"Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0",
