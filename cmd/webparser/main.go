@@ -2,18 +2,16 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"net/url"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly"
+	"github.com/zeshi09/go_web_parser/internal"
 )
 
 type Findings struct {
@@ -30,66 +28,19 @@ type Config struct {
 	OutputFile     string
 }
 
-// Структура для получения урлов из веб-админки лендингов
-type Payload struct {
-	SelectItems []struct {
-		Value string `json:"value"`
-		Text  string `json:"text"`
-	} `json:"selectItems"`
-	Type string `json:"type"`
-}
-
 // Домены, по которым мы ищем ссылки в социальных сетях
 var socialMediaDomains []string = []string{
 	"t.me",
+	"tg://",
 	"vk.com",
 	"rutube.ru",
 	"ok.ru",
 	"youtube.com",
 	"youtu.be",
-	// dzen max vkvideo 
-}
-
-// URL админки лендингов
-var urlForGetLandings string = "https://tools.kontur.ru/module/LandingPage/list"
-
-// Получаем список лендинговых урлов
-func GetLandingsUrls(cookie string) ([]string, error) {
-
-	tr := &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-	}
-	client := &http.Client{
-		Transport: tr,
-	}
-
-	req, err := http.NewRequest("GET", urlForGetLandings, nil)
-
-	req.Header.Set("Cookie", cookie)
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	raw := doc.Find(`script#filter-template-LandingDomainId-app-model`).First().Text()
-	var p Payload
-	if err := json.Unmarshal([]byte(raw), &p); err != nil {
-		return nil, err
-	}
-
-	var urls []string
-
-	for _, it := range p.SelectItems {
-		urls = append(urls, it.Text)
-	}
-
-	return urls, nil
+	"vkvideo.ru",
+	"oneme.ru",
+	"max.ru",
+	"dzen",
 }
 
 // Функция для поиска вхождения в списке доменов
@@ -191,7 +142,7 @@ func main() {
 	socialLinks := make(map[string]struct{})
 
 	// domains, err := ReadUrlFile("landings_urls.txt")
-	domains, err := GetLandingsUrls(*cookie)
+	domains, err := internal.GetLandingsUrls(*cookie)
 	if err != nil {
 		log.Fatalf("Read domains list in tools.kontur.ru error: %v", err)
 	}
@@ -231,7 +182,7 @@ func main() {
 		}
 	}
 
-	// сохраняем уникальные ссылки в файл
+	// сохраняем уникальные ссылки в массив
 	if len(socialLinks) == 0 {
 		fmt.Println("Social links not found")
 		return
@@ -240,18 +191,8 @@ func main() {
 	for u := range socialLinks {
 		out = append(out, u)
 	}
-	f, err := os.Create(config.OutputFile)
-	if err != nil {
-		log.Fatalf("Create output: %v", err)
-	}
-	defer f.Close()
-	enc := json.NewEncoder(f)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(out); err != nil {
-		log.Fatalf("write json: %v", err)
-	}
-	fmt.Printf("Saved %d unique links → %s\n", len(out), config.OutputFile)
-	// запись в базу данных 
+	fmt.Println(out)
+	// запись в базу данных
 	// другой сервис который ходит в базу
 	// + вебхук в мм
 }
