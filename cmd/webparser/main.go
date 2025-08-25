@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -12,6 +13,7 @@ import (
 	"github.com/zeshi09/go_web_parser/internal/crawler"
 	"github.com/zeshi09/go_web_parser/internal/filter"
 	"github.com/zeshi09/go_web_parser/internal/input"
+	"github.com/zeshi09/go_web_parser/internal/storage"
 )
 
 type Findings struct {
@@ -28,7 +30,7 @@ func main() {
 		ProxyURL:       "http://192.168.2.200:8080",
 		RequestTimeout: 20 * time.Second,
 		MaxDepth:       2,
-		Parallelism:    2,
+		Parallelism:    5,
 		OutputFile:     "social_media_links.json",
 	}
 
@@ -88,6 +90,23 @@ func main() {
 	}
 	fmt.Println(out)
 	// запись в базу данных
+	dbConfig := storage.LoadConfigFromEnv()
+	dbService, err := storage.NewSocialLinkService(dbConfig)
+	if err != nil {
+		log.Fatalf("failes to connect to db: %v", err)
+	}
+	defer dbService.Close()
+	fmt.Println("Connected to db successfully")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	err = dbService.SaveSocialLinks(ctx, out, "batch_"+fmt.Sprintf("%d", len(domains)))
+	cancel()
+
+	if err != nil {
+		log.Printf("error saving to db: %v", err)
+	} else {
+		fmt.Printf("successfully saved links to db\n")
+	}
 	// другой сервис который ходит в базу
 	// + вебхук в мм
 }

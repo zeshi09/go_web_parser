@@ -31,10 +31,10 @@ type SocialLinkService struct {
 // LoadConfigFromEnv загружает конфигурацию из переменных окружения
 func LoadConfigFromEnv() *DatabaseConfig {
 	return &DatabaseConfig{
-		Host:     getEnv("DB_HOST", "localhost"),
+		Host:     getEnv("DB_HOST", "172.17.0.2"),
 		Port:     getEnv("DB_PORT", "5432"),
 		User:     getEnv("DB_USER", "postgres"),
-		Password: getEnv("DB_PASSWORD", ""),
+		Password: getEnv("DB_PASSWORD", "postgres"),
 		DBName:   getEnv("DB_NAME", "social_links_db"),
 		SSLMode:  getEnv("DB_SSLMODE", "disable"),
 	}
@@ -89,4 +89,30 @@ func NewSocialLinkService(cfg *DatabaseConfig) (*SocialLinkService, error) {
 // Close закрывает соединение с базой данных
 func (s *SocialLinkService) Close() error {
 	return s.client.Close()
+}
+
+// SaveSocialLinks сохраняет массив социальных ссылок в базу данных
+func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []string, sourceDomain string) error {
+	if len(socialLinks) == 0 {
+		return nil
+	}
+
+	// Создаем bulk операцию для массовой вставки
+	bulk := make([]*ent.SocialLinkCreate, 0, len(socialLinks))
+
+	for _, link := range socialLinks {
+		bulk = append(bulk, s.client.SocialLink.Create().
+			SetLink(link),
+		)
+	}
+
+	// Если есть что сохранять, выполняем bulk insert
+	if len(bulk) > 0 {
+		_, err := s.client.SocialLink.CreateBulk(bulk...).Save(ctx)
+		if err != nil {
+			return fmt.Errorf("error saving social links: %w", err)
+		}
+	}
+
+	return nil
 }
