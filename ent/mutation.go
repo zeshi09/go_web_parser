@@ -33,10 +33,8 @@ type SocialLinkMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	link          *string
 	url           *string
 	domain        *string
-	source_domain *string
 	created_at    *time.Time
 	clearedFields map[string]struct{}
 	done          bool
@@ -142,42 +140,6 @@ func (m *SocialLinkMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetLink sets the "link" field.
-func (m *SocialLinkMutation) SetLink(s string) {
-	m.link = &s
-}
-
-// Link returns the value of the "link" field in the mutation.
-func (m *SocialLinkMutation) Link() (r string, exists bool) {
-	v := m.link
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLink returns the old "link" field's value of the SocialLink entity.
-// If the SocialLink object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SocialLinkMutation) OldLink(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLink is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLink requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLink: %w", err)
-	}
-	return oldValue.Link, nil
-}
-
-// ResetLink resets all changes to the "link" field.
-func (m *SocialLinkMutation) ResetLink() {
-	m.link = nil
-}
-
 // SetURL sets the "url" field.
 func (m *SocialLinkMutation) SetURL(s string) {
 	m.url = &s
@@ -263,55 +225,6 @@ func (m *SocialLinkMutation) ResetDomain() {
 	delete(m.clearedFields, sociallink.FieldDomain)
 }
 
-// SetSourceDomain sets the "source_domain" field.
-func (m *SocialLinkMutation) SetSourceDomain(s string) {
-	m.source_domain = &s
-}
-
-// SourceDomain returns the value of the "source_domain" field in the mutation.
-func (m *SocialLinkMutation) SourceDomain() (r string, exists bool) {
-	v := m.source_domain
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSourceDomain returns the old "source_domain" field's value of the SocialLink entity.
-// If the SocialLink object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SocialLinkMutation) OldSourceDomain(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSourceDomain is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSourceDomain requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSourceDomain: %w", err)
-	}
-	return oldValue.SourceDomain, nil
-}
-
-// ClearSourceDomain clears the value of the "source_domain" field.
-func (m *SocialLinkMutation) ClearSourceDomain() {
-	m.source_domain = nil
-	m.clearedFields[sociallink.FieldSourceDomain] = struct{}{}
-}
-
-// SourceDomainCleared returns if the "source_domain" field was cleared in this mutation.
-func (m *SocialLinkMutation) SourceDomainCleared() bool {
-	_, ok := m.clearedFields[sociallink.FieldSourceDomain]
-	return ok
-}
-
-// ResetSourceDomain resets all changes to the "source_domain" field.
-func (m *SocialLinkMutation) ResetSourceDomain() {
-	m.source_domain = nil
-	delete(m.clearedFields, sociallink.FieldSourceDomain)
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (m *SocialLinkMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -382,18 +295,12 @@ func (m *SocialLinkMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SocialLinkMutation) Fields() []string {
-	fields := make([]string, 0, 5)
-	if m.link != nil {
-		fields = append(fields, sociallink.FieldLink)
-	}
+	fields := make([]string, 0, 3)
 	if m.url != nil {
 		fields = append(fields, sociallink.FieldURL)
 	}
 	if m.domain != nil {
 		fields = append(fields, sociallink.FieldDomain)
-	}
-	if m.source_domain != nil {
-		fields = append(fields, sociallink.FieldSourceDomain)
 	}
 	if m.created_at != nil {
 		fields = append(fields, sociallink.FieldCreatedAt)
@@ -406,14 +313,10 @@ func (m *SocialLinkMutation) Fields() []string {
 // schema.
 func (m *SocialLinkMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case sociallink.FieldLink:
-		return m.Link()
 	case sociallink.FieldURL:
 		return m.URL()
 	case sociallink.FieldDomain:
 		return m.Domain()
-	case sociallink.FieldSourceDomain:
-		return m.SourceDomain()
 	case sociallink.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -425,14 +328,10 @@ func (m *SocialLinkMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *SocialLinkMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case sociallink.FieldLink:
-		return m.OldLink(ctx)
 	case sociallink.FieldURL:
 		return m.OldURL(ctx)
 	case sociallink.FieldDomain:
 		return m.OldDomain(ctx)
-	case sociallink.FieldSourceDomain:
-		return m.OldSourceDomain(ctx)
 	case sociallink.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -444,13 +343,6 @@ func (m *SocialLinkMutation) OldField(ctx context.Context, name string) (ent.Val
 // type.
 func (m *SocialLinkMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case sociallink.FieldLink:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLink(v)
-		return nil
 	case sociallink.FieldURL:
 		v, ok := value.(string)
 		if !ok {
@@ -464,13 +356,6 @@ func (m *SocialLinkMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDomain(v)
-		return nil
-	case sociallink.FieldSourceDomain:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSourceDomain(v)
 		return nil
 	case sociallink.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -512,9 +397,6 @@ func (m *SocialLinkMutation) ClearedFields() []string {
 	if m.FieldCleared(sociallink.FieldDomain) {
 		fields = append(fields, sociallink.FieldDomain)
 	}
-	if m.FieldCleared(sociallink.FieldSourceDomain) {
-		fields = append(fields, sociallink.FieldSourceDomain)
-	}
 	return fields
 }
 
@@ -532,9 +414,6 @@ func (m *SocialLinkMutation) ClearField(name string) error {
 	case sociallink.FieldDomain:
 		m.ClearDomain()
 		return nil
-	case sociallink.FieldSourceDomain:
-		m.ClearSourceDomain()
-		return nil
 	}
 	return fmt.Errorf("unknown SocialLink nullable field %s", name)
 }
@@ -543,17 +422,11 @@ func (m *SocialLinkMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *SocialLinkMutation) ResetField(name string) error {
 	switch name {
-	case sociallink.FieldLink:
-		m.ResetLink()
-		return nil
 	case sociallink.FieldURL:
 		m.ResetURL()
 		return nil
 	case sociallink.FieldDomain:
 		m.ResetDomain()
-		return nil
-	case sociallink.FieldSourceDomain:
-		m.ResetSourceDomain()
 		return nil
 	case sociallink.FieldCreatedAt:
 		m.ResetCreatedAt()

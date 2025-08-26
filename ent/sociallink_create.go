@@ -20,12 +20,6 @@ type SocialLinkCreate struct {
 	hooks    []Hook
 }
 
-// SetLink sets the "link" field.
-func (_c *SocialLinkCreate) SetLink(v string) *SocialLinkCreate {
-	_c.mutation.SetLink(v)
-	return _c
-}
-
 // SetURL sets the "url" field.
 func (_c *SocialLinkCreate) SetURL(v string) *SocialLinkCreate {
 	_c.mutation.SetURL(v)
@@ -42,20 +36,6 @@ func (_c *SocialLinkCreate) SetDomain(v string) *SocialLinkCreate {
 func (_c *SocialLinkCreate) SetNillableDomain(v *string) *SocialLinkCreate {
 	if v != nil {
 		_c.SetDomain(*v)
-	}
-	return _c
-}
-
-// SetSourceDomain sets the "source_domain" field.
-func (_c *SocialLinkCreate) SetSourceDomain(v string) *SocialLinkCreate {
-	_c.mutation.SetSourceDomain(v)
-	return _c
-}
-
-// SetNillableSourceDomain sets the "source_domain" field if the given value is not nil.
-func (_c *SocialLinkCreate) SetNillableSourceDomain(v *string) *SocialLinkCreate {
-	if v != nil {
-		_c.SetSourceDomain(*v)
 	}
 	return _c
 }
@@ -117,9 +97,6 @@ func (_c *SocialLinkCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *SocialLinkCreate) check() error {
-	if _, ok := _c.mutation.Link(); !ok {
-		return &ValidationError{Name: "link", err: errors.New(`ent: missing required field "SocialLink.link"`)}
-	}
 	if _, ok := _c.mutation.URL(); !ok {
 		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "SocialLink.url"`)}
 	}
@@ -152,10 +129,6 @@ func (_c *SocialLinkCreate) createSpec() (*SocialLink, *sqlgraph.CreateSpec) {
 		_node = &SocialLink{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(sociallink.Table, sqlgraph.NewFieldSpec(sociallink.FieldID, field.TypeInt))
 	)
-	if value, ok := _c.mutation.Link(); ok {
-		_spec.SetField(sociallink.FieldLink, field.TypeString, value)
-		_node.Link = value
-	}
 	if value, ok := _c.mutation.URL(); ok {
 		_spec.SetField(sociallink.FieldURL, field.TypeString, value)
 		_node.URL = value
@@ -163,10 +136,6 @@ func (_c *SocialLinkCreate) createSpec() (*SocialLink, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Domain(); ok {
 		_spec.SetField(sociallink.FieldDomain, field.TypeString, value)
 		_node.Domain = value
-	}
-	if value, ok := _c.mutation.SourceDomain(); ok {
-		_spec.SetField(sociallink.FieldSourceDomain, field.TypeString, value)
-		_node.SourceDomain = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(sociallink.FieldCreatedAt, field.TypeTime, value)

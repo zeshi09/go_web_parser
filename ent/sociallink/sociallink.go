@@ -13,14 +13,10 @@ const (
 	Label = "social_link"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldLink holds the string denoting the link field in the database.
-	FieldLink = "link"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
 	// FieldDomain holds the string denoting the domain field in the database.
 	FieldDomain = "domain"
-	// FieldSourceDomain holds the string denoting the source_domain field in the database.
-	FieldSourceDomain = "source_domain"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// Table holds the table name of the sociallink in the database.
@@ -30,10 +26,8 @@ const (
 // Columns holds all SQL columns for sociallink fields.
 var Columns = []string{
 	FieldID,
-	FieldLink,
 	FieldURL,
 	FieldDomain,
-	FieldSourceDomain,
 	FieldCreatedAt,
 }
 
@@ -60,11 +54,6 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByLink orders the results by the link field.
-func ByLink(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLink, opts...).ToFunc()
-}
-
 // ByURL orders the results by the url field.
 func ByURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldURL, opts...).ToFunc()
@@ -73,11 +62,6 @@ func ByURL(opts ...sql.OrderTermOption) OrderOption {
 // ByDomain orders the results by the domain field.
 func ByDomain(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDomain, opts...).ToFunc()
-}
-
-// BySourceDomain orders the results by the source_domain field.
-func BySourceDomain(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSourceDomain, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

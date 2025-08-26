@@ -54,11 +54,6 @@ func IDLTE(id int) predicate.SocialLink {
 	return predicate.SocialLink(sql.FieldLTE(FieldID, id))
 }
 
-// Link applies equality check predicate on the "link" field. It's identical to LinkEQ.
-func Link(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldEQ(FieldLink, v))
-}
-
 // URL applies equality check predicate on the "url" field. It's identical to URLEQ.
 func URL(v string) predicate.SocialLink {
 	return predicate.SocialLink(sql.FieldEQ(FieldURL, v))
@@ -69,79 +64,9 @@ func Domain(v string) predicate.SocialLink {
 	return predicate.SocialLink(sql.FieldEQ(FieldDomain, v))
 }
 
-// SourceDomain applies equality check predicate on the "source_domain" field. It's identical to SourceDomainEQ.
-func SourceDomain(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldEQ(FieldSourceDomain, v))
-}
-
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.SocialLink {
 	return predicate.SocialLink(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// LinkEQ applies the EQ predicate on the "link" field.
-func LinkEQ(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldEQ(FieldLink, v))
-}
-
-// LinkNEQ applies the NEQ predicate on the "link" field.
-func LinkNEQ(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldNEQ(FieldLink, v))
-}
-
-// LinkIn applies the In predicate on the "link" field.
-func LinkIn(vs ...string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldIn(FieldLink, vs...))
-}
-
-// LinkNotIn applies the NotIn predicate on the "link" field.
-func LinkNotIn(vs ...string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldNotIn(FieldLink, vs...))
-}
-
-// LinkGT applies the GT predicate on the "link" field.
-func LinkGT(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldGT(FieldLink, v))
-}
-
-// LinkGTE applies the GTE predicate on the "link" field.
-func LinkGTE(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldGTE(FieldLink, v))
-}
-
-// LinkLT applies the LT predicate on the "link" field.
-func LinkLT(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldLT(FieldLink, v))
-}
-
-// LinkLTE applies the LTE predicate on the "link" field.
-func LinkLTE(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldLTE(FieldLink, v))
-}
-
-// LinkContains applies the Contains predicate on the "link" field.
-func LinkContains(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldContains(FieldLink, v))
-}
-
-// LinkHasPrefix applies the HasPrefix predicate on the "link" field.
-func LinkHasPrefix(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldHasPrefix(FieldLink, v))
-}
-
-// LinkHasSuffix applies the HasSuffix predicate on the "link" field.
-func LinkHasSuffix(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldHasSuffix(FieldLink, v))
-}
-
-// LinkEqualFold applies the EqualFold predicate on the "link" field.
-func LinkEqualFold(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldEqualFold(FieldLink, v))
-}
-
-// LinkContainsFold applies the ContainsFold predicate on the "link" field.
-func LinkContainsFold(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldContainsFold(FieldLink, v))
 }
 
 // URLEQ applies the EQ predicate on the "url" field.
@@ -282,81 +207,6 @@ func DomainEqualFold(v string) predicate.SocialLink {
 // DomainContainsFold applies the ContainsFold predicate on the "domain" field.
 func DomainContainsFold(v string) predicate.SocialLink {
 	return predicate.SocialLink(sql.FieldContainsFold(FieldDomain, v))
-}
-
-// SourceDomainEQ applies the EQ predicate on the "source_domain" field.
-func SourceDomainEQ(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldEQ(FieldSourceDomain, v))
-}
-
-// SourceDomainNEQ applies the NEQ predicate on the "source_domain" field.
-func SourceDomainNEQ(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldNEQ(FieldSourceDomain, v))
-}
-
-// SourceDomainIn applies the In predicate on the "source_domain" field.
-func SourceDomainIn(vs ...string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldIn(FieldSourceDomain, vs...))
-}
-
-// SourceDomainNotIn applies the NotIn predicate on the "source_domain" field.
-func SourceDomainNotIn(vs ...string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldNotIn(FieldSourceDomain, vs...))
-}
-
-// SourceDomainGT applies the GT predicate on the "source_domain" field.
-func SourceDomainGT(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldGT(FieldSourceDomain, v))
-}
-
-// SourceDomainGTE applies the GTE predicate on the "source_domain" field.
-func SourceDomainGTE(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldGTE(FieldSourceDomain, v))
-}
-
-// SourceDomainLT applies the LT predicate on the "source_domain" field.
-func SourceDomainLT(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldLT(FieldSourceDomain, v))
-}
-
-// SourceDomainLTE applies the LTE predicate on the "source_domain" field.
-func SourceDomainLTE(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldLTE(FieldSourceDomain, v))
-}
-
-// SourceDomainContains applies the Contains predicate on the "source_domain" field.
-func SourceDomainContains(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldContains(FieldSourceDomain, v))
-}
-
-// SourceDomainHasPrefix applies the HasPrefix predicate on the "source_domain" field.
-func SourceDomainHasPrefix(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldHasPrefix(FieldSourceDomain, v))
-}
-
-// SourceDomainHasSuffix applies the HasSuffix predicate on the "source_domain" field.
-func SourceDomainHasSuffix(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldHasSuffix(FieldSourceDomain, v))
-}
-
-// SourceDomainIsNil applies the IsNil predicate on the "source_domain" field.
-func SourceDomainIsNil() predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldIsNull(FieldSourceDomain))
-}
-
-// SourceDomainNotNil applies the NotNil predicate on the "source_domain" field.
-func SourceDomainNotNil() predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldNotNull(FieldSourceDomain))
-}
-
-// SourceDomainEqualFold applies the EqualFold predicate on the "source_domain" field.
-func SourceDomainEqualFold(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldEqualFold(FieldSourceDomain, v))
-}
-
-// SourceDomainContainsFold applies the ContainsFold predicate on the "source_domain" field.
-func SourceDomainContainsFold(v string) predicate.SocialLink {
-	return predicate.SocialLink(sql.FieldContainsFold(FieldSourceDomain, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

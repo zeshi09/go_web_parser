@@ -28,9 +28,9 @@ func main() {
 
 	config := config.Config{
 		ProxyURL:       "http://192.168.2.200:8080",
-		RequestTimeout: 20 * time.Second,
+		RequestTimeout: 10 * time.Second,
 		MaxDepth:       2,
-		Parallelism:    5,
+		Parallelism:    15,
 		OutputFile:     "social_media_links.json",
 	}
 
@@ -61,8 +61,11 @@ func main() {
 		if abs_link == "" || !filter.IsValidURL(abs_link) {
 			return
 		}
-		if filter.ContainsAny(abs_link, filter.SocialMediaDomains) {
-			socialLinks[abs_link] = struct{}{}
+
+		clean_abs_link := filter.CleanPath(abs_link)
+
+		if filter.ContainsAny(clean_abs_link, filter.SocialMediaDomains) {
+			socialLinks[clean_abs_link] = struct{}{}
 		}
 
 		_ = e.Request.Visit(abs_link)
@@ -78,12 +81,6 @@ func main() {
 			fmt.Printf("Request error: %v\n", err)
 		}
 	}
-	// for i := 0; i < 10; i++ {
-	// 	err = c.Visit("https://" + domains[i])
-	// 	if err != nil {
-	// 		fmt.Printf("Request error: %v\n", err)
-	// 	}
-	// }
 
 	// сохраняем уникальные ссылки в массив
 	if len(socialLinks) == 0 {

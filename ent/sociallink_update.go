@@ -28,20 +28,6 @@ func (_u *SocialLinkUpdate) Where(ps ...predicate.SocialLink) *SocialLinkUpdate 
 	return _u
 }
 
-// SetLink sets the "link" field.
-func (_u *SocialLinkUpdate) SetLink(v string) *SocialLinkUpdate {
-	_u.mutation.SetLink(v)
-	return _u
-}
-
-// SetNillableLink sets the "link" field if the given value is not nil.
-func (_u *SocialLinkUpdate) SetNillableLink(v *string) *SocialLinkUpdate {
-	if v != nil {
-		_u.SetLink(*v)
-	}
-	return _u
-}
-
 // SetURL sets the "url" field.
 func (_u *SocialLinkUpdate) SetURL(v string) *SocialLinkUpdate {
 	_u.mutation.SetURL(v)
@@ -73,26 +59,6 @@ func (_u *SocialLinkUpdate) SetNillableDomain(v *string) *SocialLinkUpdate {
 // ClearDomain clears the value of the "domain" field.
 func (_u *SocialLinkUpdate) ClearDomain() *SocialLinkUpdate {
 	_u.mutation.ClearDomain()
-	return _u
-}
-
-// SetSourceDomain sets the "source_domain" field.
-func (_u *SocialLinkUpdate) SetSourceDomain(v string) *SocialLinkUpdate {
-	_u.mutation.SetSourceDomain(v)
-	return _u
-}
-
-// SetNillableSourceDomain sets the "source_domain" field if the given value is not nil.
-func (_u *SocialLinkUpdate) SetNillableSourceDomain(v *string) *SocialLinkUpdate {
-	if v != nil {
-		_u.SetSourceDomain(*v)
-	}
-	return _u
-}
-
-// ClearSourceDomain clears the value of the "source_domain" field.
-func (_u *SocialLinkUpdate) ClearSourceDomain() *SocialLinkUpdate {
-	_u.mutation.ClearSourceDomain()
 	return _u
 }
 
@@ -151,9 +117,6 @@ func (_u *SocialLinkUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 			}
 		}
 	}
-	if value, ok := _u.mutation.Link(); ok {
-		_spec.SetField(sociallink.FieldLink, field.TypeString, value)
-	}
 	if value, ok := _u.mutation.URL(); ok {
 		_spec.SetField(sociallink.FieldURL, field.TypeString, value)
 	}
@@ -162,12 +125,6 @@ func (_u *SocialLinkUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if _u.mutation.DomainCleared() {
 		_spec.ClearField(sociallink.FieldDomain, field.TypeString)
-	}
-	if value, ok := _u.mutation.SourceDomain(); ok {
-		_spec.SetField(sociallink.FieldSourceDomain, field.TypeString, value)
-	}
-	if _u.mutation.SourceDomainCleared() {
-		_spec.ClearField(sociallink.FieldSourceDomain, field.TypeString)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(sociallink.FieldCreatedAt, field.TypeTime, value)
@@ -190,20 +147,6 @@ type SocialLinkUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *SocialLinkMutation
-}
-
-// SetLink sets the "link" field.
-func (_u *SocialLinkUpdateOne) SetLink(v string) *SocialLinkUpdateOne {
-	_u.mutation.SetLink(v)
-	return _u
-}
-
-// SetNillableLink sets the "link" field if the given value is not nil.
-func (_u *SocialLinkUpdateOne) SetNillableLink(v *string) *SocialLinkUpdateOne {
-	if v != nil {
-		_u.SetLink(*v)
-	}
-	return _u
 }
 
 // SetURL sets the "url" field.
@@ -237,26 +180,6 @@ func (_u *SocialLinkUpdateOne) SetNillableDomain(v *string) *SocialLinkUpdateOne
 // ClearDomain clears the value of the "domain" field.
 func (_u *SocialLinkUpdateOne) ClearDomain() *SocialLinkUpdateOne {
 	_u.mutation.ClearDomain()
-	return _u
-}
-
-// SetSourceDomain sets the "source_domain" field.
-func (_u *SocialLinkUpdateOne) SetSourceDomain(v string) *SocialLinkUpdateOne {
-	_u.mutation.SetSourceDomain(v)
-	return _u
-}
-
-// SetNillableSourceDomain sets the "source_domain" field if the given value is not nil.
-func (_u *SocialLinkUpdateOne) SetNillableSourceDomain(v *string) *SocialLinkUpdateOne {
-	if v != nil {
-		_u.SetSourceDomain(*v)
-	}
-	return _u
-}
-
-// ClearSourceDomain clears the value of the "source_domain" field.
-func (_u *SocialLinkUpdateOne) ClearSourceDomain() *SocialLinkUpdateOne {
-	_u.mutation.ClearSourceDomain()
 	return _u
 }
 
@@ -345,9 +268,6 @@ func (_u *SocialLinkUpdateOne) sqlSave(ctx context.Context) (_node *SocialLink, 
 			}
 		}
 	}
-	if value, ok := _u.mutation.Link(); ok {
-		_spec.SetField(sociallink.FieldLink, field.TypeString, value)
-	}
 	if value, ok := _u.mutation.URL(); ok {
 		_spec.SetField(sociallink.FieldURL, field.TypeString, value)
 	}
@@ -356,12 +276,6 @@ func (_u *SocialLinkUpdateOne) sqlSave(ctx context.Context) (_node *SocialLink, 
 	}
 	if _u.mutation.DomainCleared() {
 		_spec.ClearField(sociallink.FieldDomain, field.TypeString)
-	}
-	if value, ok := _u.mutation.SourceDomain(); ok {
-		_spec.SetField(sociallink.FieldSourceDomain, field.TypeString, value)
-	}
-	if _u.mutation.SourceDomainCleared() {
-		_spec.ClearField(sociallink.FieldSourceDomain, field.TypeString)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(sociallink.FieldCreatedAt, field.TypeTime, value)

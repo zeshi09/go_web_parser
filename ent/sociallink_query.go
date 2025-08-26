@@ -262,12 +262,12 @@ func (_q *SocialLinkQuery) Clone() *SocialLinkQuery {
 // Example:
 //
 //	var v []struct {
-//		Link string `json:"link,omitempty"`
+//		URL string `json:"url,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.SocialLink.Query().
-//		GroupBy(sociallink.FieldLink).
+//		GroupBy(sociallink.FieldURL).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *SocialLinkQuery) GroupBy(field string, fields ...string) *SocialLinkGroupBy {
@@ -285,11 +285,11 @@ func (_q *SocialLinkQuery) GroupBy(field string, fields ...string) *SocialLinkGr
 // Example:
 //
 //	var v []struct {
-//		Link string `json:"link,omitempty"`
+//		URL string `json:"url,omitempty"`
 //	}
 //
 //	client.SocialLink.Query().
-//		Select(sociallink.FieldLink).
+//		Select(sociallink.FieldURL).
 //		Scan(ctx, &v)
 func (_q *SocialLinkQuery) Select(fields ...string) *SocialLinkSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

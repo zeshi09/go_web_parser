@@ -11,10 +11,8 @@ var (
 	// SocialLinksColumns holds the columns for the "social_links" table.
 	SocialLinksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "link", Type: field.TypeString},
 		{Name: "url", Type: field.TypeString},
 		{Name: "domain", Type: field.TypeString, Nullable: true},
-		{Name: "source_domain", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// SocialLinksTable holds the schema information for the "social_links" table.
@@ -26,22 +24,17 @@ var (
 			{
 				Name:    "sociallink_url",
 				Unique:  true,
-				Columns: []*schema.Column{SocialLinksColumns[2]},
+				Columns: []*schema.Column{SocialLinksColumns[1]},
 			},
 			{
 				Name:    "sociallink_domain",
 				Unique:  false,
-				Columns: []*schema.Column{SocialLinksColumns[3]},
-			},
-			{
-				Name:    "sociallink_source_domain",
-				Unique:  false,
-				Columns: []*schema.Column{SocialLinksColumns[4]},
+				Columns: []*schema.Column{SocialLinksColumns[2]},
 			},
 			{
 				Name:    "sociallink_domain_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{SocialLinksColumns[3], SocialLinksColumns[5]},
+				Columns: []*schema.Column{SocialLinksColumns[2], SocialLinksColumns[3]},
 			},
 		},
 	}

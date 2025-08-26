@@ -17,14 +17,10 @@ type SocialLink struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Social media link/identifier
-	Link string `json:"link,omitempty"`
 	// Full social media URL
 	URL string `json:"url,omitempty"`
 	// Social media domain (t.me, vk.com, etc.)
 	Domain string `json:"domain,omitempty"`
-	// Domain where this link was found
-	SourceDomain string `json:"source_domain,omitempty"`
 	// When this link was discovered
 	CreatedAt    time.Time `json:"created_at,omitempty"`
 	selectValues sql.SelectValues
@@ -37,7 +33,7 @@ func (*SocialLink) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case sociallink.FieldID:
 			values[i] = new(sql.NullInt64)
-		case sociallink.FieldLink, sociallink.FieldURL, sociallink.FieldDomain, sociallink.FieldSourceDomain:
+		case sociallink.FieldURL, sociallink.FieldDomain:
 			values[i] = new(sql.NullString)
 		case sociallink.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -62,12 +58,6 @@ func (_m *SocialLink) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int(value.Int64)
-		case sociallink.FieldLink:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field link", values[i])
-			} else if value.Valid {
-				_m.Link = value.String
-			}
 		case sociallink.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field url", values[i])
@@ -79,12 +69,6 @@ func (_m *SocialLink) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field domain", values[i])
 			} else if value.Valid {
 				_m.Domain = value.String
-			}
-		case sociallink.FieldSourceDomain:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field source_domain", values[i])
-			} else if value.Valid {
-				_m.SourceDomain = value.String
 			}
 		case sociallink.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -128,17 +112,11 @@ func (_m *SocialLink) String() string {
 	var builder strings.Builder
 	builder.WriteString("SocialLink(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
-	builder.WriteString("link=")
-	builder.WriteString(_m.Link)
-	builder.WriteString(", ")
 	builder.WriteString("url=")
 	builder.WriteString(_m.URL)
 	builder.WriteString(", ")
 	builder.WriteString("domain=")
 	builder.WriteString(_m.Domain)
-	builder.WriteString(", ")
-	builder.WriteString("source_domain=")
-	builder.WriteString(_m.SourceDomain)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

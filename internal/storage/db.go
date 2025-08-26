@@ -115,32 +115,6 @@ func (s *SocialLinkService) Close() error {
 	return s.client.Close()
 }
 
-// // SaveSocialLinks сохраняет массив социальных ссылок в базу данных
-// func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []string, sourceDomain string) error {
-// 	if len(socialLinks) == 0 {
-// 		return nil
-// 	}
-
-// 	// Создаем bulk операцию для массовой вставки
-// 	bulk := make([]*ent.SocialLinkCreate, 0, len(socialLinks))
-
-// 	for _, link := range socialLinks {
-// 		bulk = append(bulk, s.client.SocialLink.Create().
-// 			SetLink(link),
-// 		)
-// 	}
-
-// 	// Если есть что сохранять, выполняем bulk insert
-// 	if len(bulk) > 0 {
-// 		_, err := s.client.SocialLink.CreateBulk(bulk...).Save(ctx)
-// 		if err != nil {
-// 			return fmt.Errorf("error saving social links: %w", err)
-// 		}
-// 	}
-
-// 	return nil
-// }
-
 // SaveSocialLinks сохраняет массив социальных ссылок в базу данных
 func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []string, sourceDomain string) error {
 	if len(socialLinks) == 0 {
@@ -155,7 +129,7 @@ func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []s
 
 		// Проверяем, существует ли уже такая ссылка
 		exists, err := s.client.SocialLink.Query().
-			Where(sociallink.Link(link)).
+			Where(sociallink.URL(link)).
 			Exist(ctx)
 		if err != nil {
 			return fmt.Errorf("error checking if link exists: %w", err)
@@ -167,10 +141,8 @@ func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []s
 		}
 
 		bulk = append(bulk, s.client.SocialLink.Create().
-			SetLink(link).
-			SetURL(link).                  // Устанавливаем и URL
-			SetDomain(domain).             // Устанавливаем домен
-			SetSourceDomain(sourceDomain), // Устанавливаем источник
+			SetURL(link).      // Устанавливаем и URL
+			SetDomain(domain), // Устанавливаем домен
 		)
 	}
 

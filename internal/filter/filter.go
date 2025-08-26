@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"log"
 	"net/url"
 	"strings"
 )
@@ -11,13 +12,25 @@ var SocialMediaDomains []string = []string{
 	"tg://",
 	"vk.com",
 	"rutube.ru",
-	"ok.ru",
+	"/ok.ru",
 	"youtube.com",
 	"youtu.be",
 	"vkvideo.ru",
 	"oneme.ru",
 	"max.ru",
-	"dzen",
+	"dzen.",
+}
+
+func CleanPath(abs_link string) string {
+	parsed, err := url.Parse(abs_link)
+	if err != nil {
+		log.Fatalf("error to parse url: %v", err)
+	}
+	parsed.RawQuery = ""
+	parsed.Fragment = ""
+
+	return strings.TrimSuffix(parsed.String(), "/")
+
 }
 
 // Функция для поиска вхождения в списке доменов

@@ -16,7 +16,7 @@ func init() {
 	sociallinkFields := schema.SocialLink{}.Fields()
 	_ = sociallinkFields
 	// sociallinkDescCreatedAt is the schema descriptor for created_at field.
-	sociallinkDescCreatedAt := sociallinkFields[4].Descriptor()
+	sociallinkDescCreatedAt := sociallinkFields[2].Descriptor()
 	// sociallink.DefaultCreatedAt holds the default value on creation for the created_at field.
 	sociallink.DefaultCreatedAt = sociallinkDescCreatedAt.Default.(func() time.Time)
 }
