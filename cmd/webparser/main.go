@@ -4,11 +4,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
 	"github.com/gocolly/colly"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/zeshi09/go_web_parser/internal/config"
 	"github.com/zeshi09/go_web_parser/internal/crawler"
 	"github.com/zeshi09/go_web_parser/internal/filter"
@@ -22,6 +23,8 @@ type Findings struct {
 }
 
 func main() {
+
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 	cookie := flag.String("cookie", "", "Your cookie for tools.kontur.ru")
 	flag.Parse()
@@ -38,10 +41,10 @@ func main() {
 
 	domains, err := input.GetLandingsUrls(*cookie)
 	if err != nil {
-		log.Fatalf("Read domains list in tools.kontur.ru error: %v", err)
+		log.Printf("Read domains list in tools.kontur.ru error: %v", err)
 	}
 	if len(domains) == 0 {
-		log.Fatal("No domains found")
+		log.Print("No domains found")
 	}
 
 	fmt.Printf("%d domains was loaded to scan\n", len(domains))
@@ -96,7 +99,7 @@ func main() {
 	dbConfig := storage.LoadConfigFromEnv()
 	dbService, err := storage.NewSocialLinkService(dbConfig)
 	if err != nil {
-		log.Fatalf("failes to connect to db: %v", err)
+		log.Printf("failes to connect to db: %v", err)
 	}
 	defer dbService.Close()
 	fmt.Println("Connected to db successfully")
