@@ -13,8 +13,8 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/zeshi09/go_web_parser/ent"
+	"github.com/zeshi09/go_web_parser/ent/domain"
 	"github.com/zeshi09/go_web_parser/ent/sociallink"
-	// "github.com/zeshi09/go_web_parser/ent/domain"
 )
 
 // DatabaseConfig содержит настройки подключения к БД
@@ -29,6 +29,10 @@ type DatabaseConfig struct {
 
 // SocialLinkService предоставляет методы для работы с социальными ссылками
 type SocialLinkService struct {
+	client *ent.Client
+}
+
+type DomainsService struct {
 	client *ent.Client
 }
 
@@ -78,6 +82,58 @@ func extractDomain(rawURL string) string {
 	}
 
 	return domain
+}
+
+func NewDomainService(cfg *DatabaseConfig) (*DomainsService, error) {
+
+	drv, err := sql.Open(dialect.Postgres, cfg.DSN())
+	if err != nil {
+		return nil, fmt.Errorf("failed opening connection to postgres: %w", err)
+	}
+
+	// Настройка пула подключений
+	db := drv.DB()
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(100)
+	db.SetConnMaxLifetime(time.Hour)
+
+	// Проверяем подключение
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := db.PingContext(ctx); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	client := ent.NewClient(ent.Driver(drv))
+
+	// Создаем таблицы если их нет
+	if err := client.Schema.Create(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed creating schema: %w", err)
+	}
+
+	return &DomainsService{client: client}, nil
+}
+
+func (s *DomainsService) Close() error {
+	return s.client.Close()
+}
+
+func (s *DomainsService) SaveDomain(ctx context.Context, landingDomain string) error {
+	exists, err := s.client.Domain.Query().
+		Where(domain.LandingDomain(landingDomain)).
+		Exist(ctx)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return nil
+	}
+
+	_, err = s.client.Domain.Create().
+		SetLandingDomain(landingDomain).
+		Save(ctx)
+	return err
 }
 
 // NewSocialLinkService создает новый сервис для работы с социальными ссылками

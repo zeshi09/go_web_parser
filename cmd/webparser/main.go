@@ -30,7 +30,7 @@ func main() {
 	flag.Parse()
 
 	config := config.Config{
-		ProxyURL:       "http://192.168.2.200:8080",
+		// ProxyURL:       "http://192.168.2.200:8080",
 		RequestTimeout: 10 * time.Second,
 		MaxDepth:       2,
 		Parallelism:    15,
@@ -48,9 +48,6 @@ func main() {
 	}
 
 	fmt.Printf("%d domains was loaded to scan\n", len(domains))
-	// for i := range domains {
-	// 	fmt.Println(domains[i])
-	// }
 
 	c := crawler.CreateCollector(config, domains)
 
@@ -78,13 +75,19 @@ func main() {
 		fmt.Println("Visiting", r.URL.String())
 	})
 
-	for i := range domains {
+	// for i := range domains {
+	// 	err = c.Visit("https://" + domains[i])
+	// 	if err != nil {
+	// 		fmt.Printf("Request error: %v\n", err)
+	// 	}
+	// }
+
+	for i := 0; i < 4; i++ {
 		err = c.Visit("https://" + domains[i])
 		if err != nil {
 			fmt.Printf("Request error: %v\n", err)
 		}
 	}
-
 	// сохраняем уникальные ссылки в массив
 	if len(socialLinks) == 0 {
 		fmt.Println("Social links not found")
@@ -109,9 +112,22 @@ func main() {
 	err = dbService.SaveSocialLinks(ctx, out, "batch_"+fmt.Sprintf("%d", len(domains)))
 	cancel()
 
+	dbConfig2 := storage.LoadConfigFromEnv()
+	dbService2, err := storage.NewDomainService(dbConfig2)
+
+	if err != nil {
+		log.Printf("failes to connect to db: %v", err)
+	}
+	defer dbService2.Close()
+	fmt.Println("Connected to db successfully")
+
+	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
+	err = dbService2.SaveDomain(ctx, "batch_"+fmt.Sprintf("%d", len(domains)))
+	cancel()
+
 	if err != nil {
 		log.Printf("error saving to db: %v", err)
 	} else {
-		fmt.Printf("successfully saved links to db\n")
+		log.Printf("successfully saved links to db\n")
 	}
 }
