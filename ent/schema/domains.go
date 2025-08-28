@@ -17,7 +17,7 @@ func (Domain) Fields() []ent.Field {
 		field.String("landing_domain").
 			Comment("Unique landing domain"),
 		field.Time("created_at").
-			Default(time.Now()).
+			Default(time.Now).
 			Comment("When this domain was discovered"),
 	}
 }

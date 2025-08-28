@@ -19,7 +19,7 @@ func init() {
 	// domainDescCreatedAt is the schema descriptor for created_at field.
 	domainDescCreatedAt := domainFields[1].Descriptor()
 	// domain.DefaultCreatedAt holds the default value on creation for the created_at field.
-	domain.DefaultCreatedAt = domainDescCreatedAt.Default.(time.Time)
+	domain.DefaultCreatedAt = domainDescCreatedAt.Default.(func() time.Time)
 	sociallinkFields := schema.SocialLink{}.Fields()
 	_ = sociallinkFields
 	// sociallinkDescCreatedAt is the schema descriptor for created_at field.

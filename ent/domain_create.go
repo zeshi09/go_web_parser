@@ -76,7 +76,7 @@ func (_c *DomainCreate) ExecX(ctx context.Context) {
 // defaults sets the default values of the builder before save.
 func (_c *DomainCreate) defaults() {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		v := domain.DefaultCreatedAt
+		v := domain.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 }

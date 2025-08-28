@@ -14,6 +14,7 @@ import (
 
 	"github.com/zeshi09/go_web_parser/ent"
 	"github.com/zeshi09/go_web_parser/ent/sociallink"
+	// "github.com/zeshi09/go_web_parser/ent/domain"
 )
 
 // DatabaseConfig содержит настройки подключения к БД
