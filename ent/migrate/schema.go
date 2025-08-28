@@ -8,6 +8,25 @@ import (
 )
 
 var (
+	// DomainsColumns holds the columns for the "domains" table.
+	DomainsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "landing_domain", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// DomainsTable holds the schema information for the "domains" table.
+	DomainsTable = &schema.Table{
+		Name:       "domains",
+		Columns:    DomainsColumns,
+		PrimaryKey: []*schema.Column{DomainsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "domain_landing_domain",
+				Unique:  true,
+				Columns: []*schema.Column{DomainsColumns[1]},
+			},
+		},
+	}
 	// SocialLinksColumns holds the columns for the "social_links" table.
 	SocialLinksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -40,6 +59,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		DomainsTable,
 		SocialLinksTable,
 	}
 )

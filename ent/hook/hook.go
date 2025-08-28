@@ -9,6 +9,18 @@ import (
 	"github.com/zeshi09/go_web_parser/ent"
 )
 
+// The DomainFunc type is an adapter to allow the use of ordinary
+// function as Domain mutator.
+type DomainFunc func(context.Context, *ent.DomainMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DomainFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DomainMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DomainMutation", m)
+}
+
 // The SocialLinkFunc type is an adapter to allow the use of ordinary
 // function as SocialLink mutator.
 type SocialLinkFunc func(context.Context, *ent.SocialLinkMutation) (ent.Value, error)

@@ -95,6 +95,7 @@ func main() {
 		out = append(out, u)
 	}
 	fmt.Println(out)
+
 	// запись в базу данных
 	dbConfig := storage.LoadConfigFromEnv()
 	dbService, err := storage.NewSocialLinkService(dbConfig)
@@ -113,6 +114,4 @@ func main() {
 	} else {
 		fmt.Printf("successfully saved links to db\n")
 	}
-	// другой сервис который ходит в базу
-	// + вебхук в мм
 }

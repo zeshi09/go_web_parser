@@ -6,5 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Domain is the predicate function for domain builders.
+type Domain func(*sql.Selector)
+
 // SocialLink is the predicate function for sociallink builders.
 type SocialLink func(*sql.Selector)

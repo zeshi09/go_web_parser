@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/zeshi09/go_web_parser/ent/domain"
 	"github.com/zeshi09/go_web_parser/ent/sociallink"
 )
 
@@ -73,6 +74,7 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			domain.Table:     domain.ValidColumn,
 			sociallink.Table: sociallink.ValidColumn,
 		})
 	})

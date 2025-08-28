@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/zeshi09/go_web_parser/ent/domain"
 	"github.com/zeshi09/go_web_parser/ent/schema"
 	"github.com/zeshi09/go_web_parser/ent/sociallink"
 )
@@ -13,6 +14,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	domainFields := schema.Domain{}.Fields()
+	_ = domainFields
+	// domainDescCreatedAt is the schema descriptor for created_at field.
+	domainDescCreatedAt := domainFields[1].Descriptor()
+	// domain.DefaultCreatedAt holds the default value on creation for the created_at field.
+	domain.DefaultCreatedAt = domainDescCreatedAt.Default.(time.Time)
 	sociallinkFields := schema.SocialLink{}.Fields()
 	_ = sociallinkFields
 	// sociallinkDescCreatedAt is the schema descriptor for created_at field.
