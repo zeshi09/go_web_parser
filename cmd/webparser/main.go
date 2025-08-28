@@ -30,7 +30,7 @@ func main() {
 	flag.Parse()
 
 	config := config.Config{
-		// ProxyURL:       "http://192.168.2.200:8080",
+		ProxyURL:       "http://192.168.2.200:8080",
 		RequestTimeout: 10 * time.Second,
 		MaxDepth:       2,
 		Parallelism:    15,
@@ -122,7 +122,7 @@ func main() {
 	fmt.Println("Connected to db successfully")
 
 	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
-	err = dbService2.SaveDomain(ctx, "batch_"+fmt.Sprintf("%d", len(domains)))
+	err = dbService2.SaveDomain(ctx, domains)
 	cancel()
 
 	if err != nil {

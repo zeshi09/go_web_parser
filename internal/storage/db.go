@@ -119,21 +119,32 @@ func (s *DomainsService) Close() error {
 	return s.client.Close()
 }
 
-func (s *DomainsService) SaveDomain(ctx context.Context, landingDomain string) error {
-	exists, err := s.client.Domain.Query().
-		Where(domain.LandingDomain(landingDomain)).
-		Exist(ctx)
-	if err != nil {
-		return err
-	}
-	if exists {
-		return nil
+func (s *DomainsService) SaveDomain(ctx context.Context, landingDomain []string) error {
+	bulk := make([]*ent.DomainCreate, 0, len(landingDomain))
+	for i := range landingDomain {
+		exists, err := s.client.Domain.Query().
+			Where(domain.LandingDomain(landingDomain[i])).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+		if exists {
+			return nil
+		}
+
+		bulk = append(bulk, s.client.Domain.Create().
+			SetLandingDomain(landingDomain[i]),
+		)
 	}
 
-	_, err = s.client.Domain.Create().
-		SetLandingDomain(landingDomain).
-		Save(ctx)
-	return err
+	if len(bulk) > 0 {
+		_, err := s.client.Domain.CreateBulk(bulk...).Save(ctx)
+		if err != nil {
+			return fmt.Errorf("error saving social links: %w", err)
+		}
+	}
+
+	return nil
 }
 
 // NewSocialLinkService создает новый сервис для работы с социальными ссылками
