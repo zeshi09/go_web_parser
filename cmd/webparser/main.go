@@ -17,11 +17,6 @@ import (
 	"github.com/zeshi09/go_web_parser/internal/storage"
 )
 
-type Findings struct {
-	Url      string   `json:"url"`
-	Findings []string `json:"findings"`
-}
-
 func main() {
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -39,15 +34,24 @@ func main() {
 
 	socialLinks := make(map[string]struct{})
 
-	domains, err := input.GetLandingsUrls(*cookie)
-	if err != nil {
-		log.Printf("Read domains list in tools.kontur.ru error: %v", err)
-	}
-	if len(domains) == 0 {
-		log.Print("No domains found")
-	}
+	domains := []string{}
+	err := error(nil)
 
-	fmt.Printf("%d domains was loaded to scan\n", len(domains))
+	for {
+		domains, err = input.GetLandingsUrls(*cookie)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to read domains list from tools.kontur.ru")
+			time.Sleep(10 * time.Second)
+			continue
+		}
+		if len(domains) == 0 {
+			log.Warn().Msg("No domains found")
+			time.Sleep(10 * time.Second)
+			continue
+		}
+		log.Printf("%d domains was loaded to scan\n", len(domains))
+		break
+	}
 
 	c := crawler.CreateCollector(config, domains)
 
@@ -76,16 +80,16 @@ func main() {
 	})
 
 	// for i := range domains {
-	// 	err = c.Visit("https://" + domains[i])
+	// 	err := c.Visit("https://" + domains[i])
 	// 	if err != nil {
 	// 		fmt.Printf("Request error: %v\n", err)
 	// 	}
 	// }
 
 	for i := 0; i < 4; i++ {
-		err = c.Visit("https://" + domains[i])
+		err := c.Visit("https://" + domains[i])
 		if err != nil {
-			fmt.Printf("Request error: %v\n", err)
+			log.Err(err).Msg("Request error")
 		}
 	}
 	// сохраняем уникальные ссылки в массив
@@ -99,35 +103,52 @@ func main() {
 	}
 	fmt.Println(out)
 
-	// запись в базу данных
-	dbConfig := storage.LoadConfigFromEnv()
-	dbService, err := storage.NewSocialLinkService(dbConfig)
+	cfg := storage.LoadConfigFromEnv()
+
+	client, err := storage.OpenClient(cfg) // единый клиент для сервиса ссылок и доменов
 	if err != nil {
-		log.Printf("failes to connect to db: %v", err)
+		log.Err(err).Msg("failed to connect db")
 	}
-	defer dbService.Close()
-	fmt.Println("Connected to db successfully")
+	defer client.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	err = dbService.SaveSocialLinks(ctx, out, "batch_"+fmt.Sprintf("%d", len(domains)))
-	cancel()
+	defer cancel()
 
-	dbConfig2 := storage.LoadConfigFromEnv()
-	dbService2, err := storage.NewDomainService(dbConfig2)
-
-	if err != nil {
-		log.Printf("failes to connect to db: %v", err)
-	}
-	defer dbService2.Close()
-	fmt.Println("Connected to db successfully")
-
-	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
-	err = dbService2.SaveDomain(ctx, domains)
-	cancel()
-
-	if err != nil {
-		log.Printf("error saving to db: %v", err)
+	if err := storage.SaveAll(ctx, client, out, domains); err != nil {
+		log.Err(err).Msg("error saving to db")
 	} else {
-		log.Printf("successfully saved links to db\n")
+		log.Printf("successfully saved links and domains to db")
 	}
+
+	// // запись в базу данных
+	// dbConfig := storage.LoadConfigFromEnv()
+	// dbService, err := storage.NewSocialLinkService(dbConfig)
+	// if err != nil {
+	// 	log.Printf("failes to connect to db: %v", err)
+	// }
+	// defer dbService.Close()
+	// fmt.Println("Connected to db successfully")
+
+	// ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	// err = dbService.SaveSocialLinks(ctx, out, "batch_"+fmt.Sprintf("%d", len(domains)))
+	// cancel()
+
+	// dbConfig2 := storage.LoadConfigFromEnv()
+	// dbService2, err := storage.NewDomainService(dbConfig2)
+
+	// if err != nil {
+	// 	log.Printf("failes to connect to db: %v", err)
+	// }
+	// defer dbService2.Close()
+	// fmt.Println("Connected to db successfully")
+
+	// ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
+	// err = dbService2.SaveDomain(ctx, domains)
+	// cancel()
+
+	// if err != nil {
+	// 	log.Printf("error saving to db: %v", err)
+	// } else {
+	// 	log.Printf("successfully saved links to db\n")
+	// }
 }

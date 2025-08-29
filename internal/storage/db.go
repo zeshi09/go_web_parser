@@ -63,6 +63,62 @@ func (cfg *DatabaseConfig) DSN() string {
 	)
 }
 
+func OpenClient(cfg *DatabaseConfig) (*ent.Client, error) {
+	drv, err := sql.Open(dialect.Postgres, cfg.DSN())
+	if err != nil {
+		return nil, fmt.Errorf("failed opening connection to postgres: %w", err)
+	}
+
+	db := drv.DB()
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(100)
+	db.SetConnMaxLifetime(time.Hour)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	client := ent.NewClient(ent.Driver(drv))
+
+	if err := client.Schema.Create(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed creating schema: %w", err)
+	}
+
+	return client, nil
+}
+
+func NewDomainServiceWithClient(client *ent.Client) *DomainsService {
+	return &DomainsService{client: client}
+}
+
+func NewSocialLinkServiceWithClient(client *ent.Client) *SocialLinkService {
+	return &SocialLinkService{client: client}
+}
+
+func SaveAll(ctx context.Context, client *ent.Client, socialLinks []string, landingDomains []string) error {
+	tx, err := client.Tx(ctx)
+	if err != nil {
+		return fmt.Errorf("begin tx: %w", err)
+	}
+
+	if err := NewSocialLinkServiceWithClient(tx.Client()).SaveSocialLinks(ctx, socialLinks, "batch"); err != nil {
+		_ = tx.Rollback()
+		return fmt.Errorf("save social links: %w", err)
+	}
+
+	if err := NewDomainServiceWithClient(tx.Client()).SaveDomain(ctx, landingDomains); err != nil {
+		_ = tx.Rollback()
+		return fmt.Errorf("save domains: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit tx: %w", err)
+	}
+	return nil
+}
+
 // extractDomain извлекает домен из URL
 func extractDomain(rawURL string) string {
 	// Для telegram ссылок вида tg://
@@ -223,35 +279,4 @@ func (s *SocialLinkService) SaveSocialLinks(ctx context.Context, socialLinks []s
 	}
 
 	return nil
-}
-
-// GetAllSocialLinks получает все социальные ссылки
-func (s *SocialLinkService) GetAllSocialLinks(ctx context.Context) ([]*ent.SocialLink, error) {
-	return s.client.SocialLink.Query().All(ctx)
-}
-
-// GetSocialLinksByDomain получает ссылки по домену
-func (s *SocialLinkService) GetSocialLinksByDomain(ctx context.Context, domain string) ([]*ent.SocialLink, error) {
-	return s.client.SocialLink.Query().
-		Where(sociallink.Domain(domain)).
-		All(ctx)
-}
-
-// GetStats возвращает статистику по социальным ссылкам
-func (s *SocialLinkService) GetStats(ctx context.Context) (map[string]int, error) {
-	links, err := s.GetAllSocialLinks(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	stats := make(map[string]int)
-	for _, link := range links {
-		domain := link.Domain
-		if domain == "" {
-			domain = "unknown"
-		}
-		stats[domain]++
-	}
-
-	return stats, nil
 }
