@@ -1,9 +1,10 @@
 package filter
 
 import (
-	"log"
 	"net/url"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 // Домены, по которым мы ищем ссылки в социальных сетях
@@ -24,7 +25,7 @@ var SocialMediaDomains []string = []string{
 func CleanPath(abs_link string) string {
 	parsed, err := url.Parse(abs_link)
 	if err != nil {
-		log.Fatalf("error to parse url: %v", err)
+		log.Err(err).Msg("error to parse url")
 	}
 	parsed.RawQuery = ""
 	parsed.Fragment = ""

@@ -103,6 +103,7 @@ func main() {
 	}
 	fmt.Println(out)
 
+	// записываем домены и ссылки в базу данных
 	cfg := storage.LoadConfigFromEnv()
 
 	client, err := storage.OpenClient(cfg) // единый клиент для сервиса ссылок и доменов
