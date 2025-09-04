@@ -186,12 +186,13 @@ func (s *DomainsService) SaveDomain(ctx context.Context, landingDomain []string)
 			return err
 		}
 		if exists {
-			return nil
+			continue
 		}
 
 		bulk = append(bulk, s.client.Domain.Create().
 			SetLandingDomain(landingDomain[i]),
 		)
+		// fmt.Println(bulk)
 	}
 
 	if len(bulk) > 0 {
