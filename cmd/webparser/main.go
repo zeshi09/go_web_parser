@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gocolly/colly"
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/zeshi09/go_web_parser/ent"
@@ -32,6 +33,12 @@ func main() {
 		domains     = []string{}
 		c           = crawler.CreateCollector(config, domains)
 	)
+
+	// подгружаем .env файл, в котором хранятся все переменные для базы и мм
+	err := godotenv.Load()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to load .env")
+	}
 
 	// обозначаем время в формате unix для логов
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
