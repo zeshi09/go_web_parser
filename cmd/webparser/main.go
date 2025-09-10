@@ -34,7 +34,7 @@ func main() {
 		c           = crawler.CreateCollector(config, domains)
 	)
 
-	// подгружаем .env файл, в котором хранятся все переменные для базы и мм
+	// подгружаем .env файл, в котором хранятся все переменные для базы
 	err := godotenv.Load()
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to load .env")
