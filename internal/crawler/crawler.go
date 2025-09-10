@@ -7,6 +7,10 @@ import (
 
 )
 
+type PageURL struct {
+	URL string `json:"url"`
+}
+
 // Создаем сущность скрапера
 func CreateCollector(config config.Config, domains []string) *colly.Collector {
 	c := colly.NewCollector(
